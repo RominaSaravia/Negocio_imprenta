@@ -1,5 +1,5 @@
 from sqlmodel import Field, Session, SQLModel, create_engine, select,delete,join
-from validations import Post_Cart,Patch_Cart
+from validations import Post_Print,Post_Cart,Patch_Cart
 from datetime import datetime
 
 class Cart(SQLModel, table=True):
@@ -12,11 +12,13 @@ class Cart(SQLModel, table=True):
 class Print(SQLModel, table=True):
     id: int =  Field(default=None, primary_key=True, unique=True)
     cart_id: int = Field(default=None, foreign_key="cart.id")
-    Page_Size: str 
-    n_Pages: str
+    page_type: str
+    page_size: str
+    n_prints: int
+    n_copies: int
+    color: str
     price: float | None = Field(default=None, index=True)
-    state: str
-    date: str = ''
+    url_file: str
 
     
 
@@ -83,3 +85,73 @@ def upsertCart(cartBody:Post_Cart):
         session.commit()
         session.refresh(result)
         return result
+
+#----------------------------PRINTS_TABLE-------------------------------------
+
+def getAllPrints():
+    with Session(engine) as session:
+        result = []
+        result = session.exec(select(Print)).all()        
+        return result
+
+def addNewPrint(newPrint: Post_Print):
+    with Session(engine) as session:
+        cartItem = session.exec( select(Cart).where(Cart.id == newPrint.cart_id) ).first() # verifico que exista el carrito en la DB
+        if(cartItem != None): 
+            newPrintComplete = completePrintDetails(newPrint)
+            session.add(newPrintComplete)
+            session.commit()
+            session.refresh(newPrintComplete)
+        else: # el carrito no se encuentra en la DB
+            return 'Error: No hay carrito'
+        
+        return newPrintComplete
+
+
+def completePrintDetails(newPrint: Post_Print):
+    color_price = 0
+    page_price = 0
+    print_price = 0
+    error = ''
+
+    PrintCompleto = Print(
+        cart_id= newPrint.cart_id,
+        page_size = newPrint.page_size,
+        page_type = newPrint.page_type,
+        color = newPrint.color,
+        n_copies=newPrint.n_copies,
+        n_prints=newPrint.n_prints,
+        url_file = newPrint.url_file
+        )
+    
+    # Determinar el precio de la impresion
+    match newPrint.color:
+        case "Color":
+            color_price = 500
+        case "ByN":
+            color_price = 250
+        case _:
+            color_price = 0
+            error += 'Falta detallar que color de la impresion. '
+    # Determinar el precio del tamaño de la hoja de impresion
+    match newPrint.page_size:
+        case "A4":
+            page_price = 500
+        case "A3":
+            page_price = 1000
+        case _:
+            error += 'Falta detallar que tamaño de hoja. '
+    # Determinar el precio del papel a usar
+    match newPrint.page_type:
+        case "Obra 80gr":
+            print_price = 250
+        case "Papel ilustración 120gr":
+            print_price = 350
+        case _:
+            error += 'Falta detallar el tipo de hoja a imprimir. '
+
+    if (error):
+        return error
+    else:
+        PrintCompleto.price = (color_price + page_price + print_price) * newPrint.n_copies
+        return PrintCompleto

@@ -10,8 +10,11 @@ class Patch_Cart(BaseModel):
     state: str
 
 class Post_Print(BaseModel):
-    n_order: int
-    pape_type: str
+    cart_id: int
+    page_type: str
+    page_size: str
     n_prints: int
+    n_copies: int
     color: str
-    print_size: str
+    url_file: str
+
