@@ -1,6 +1,7 @@
 from fastapi import FastAPI,Request, Response, Cookie
 from fastapi.responses import HTMLResponse
-from db import create_db_and_tables
+from db import create_db_and_tables,upsertCart,patchCartState
+from validations import Post_Cart,Patch_Cart
 
 app = FastAPI()
 
@@ -25,9 +26,20 @@ async def read_items():
     return HTMLResponse(content=html_content, status_code=200)
 
 
-##Get all prints types available on DB
-@app.get("/prints")
-async def get_tickets():
-    return 
+@app.get("/seecart/{cart_id}")
+async def get_cart(cart_id : int):
+    print('************GET_CART****************')
+    result,result2 = getCart_Print(cart_id) 
+    return result,result2
 
+@app.post("/newCart")
+async def post_cart(body: Post_Cart):
+    result = upsertCart(body)
+    return result
 
+##########__ONLY__ADMIN__#################
+@app.patch("/newStateOnCart/{cart_id}")
+async def patch_cart(body: Patch_Cart, cart_id : int):
+    result = patchCartState(cart_id, body)
+    return result
+##########################################

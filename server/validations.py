@@ -1,9 +1,13 @@
 from pydantic import BaseModel
 
 class Post_Cart(BaseModel):
+    id: int | None = None
     client_name: str
     client_email: str
-    url_file: str
+    state: str | None = 'New'
+
+class Patch_Cart(BaseModel):
+    state: str
 
 class Post_Print(BaseModel):
     n_order: int
