@@ -1,7 +1,7 @@
 from fastapi import FastAPI,Request, Response, Cookie
 from fastapi.responses import HTMLResponse
-from db import create_db_and_tables,upsertCart,patchCartState
-from validations import Post_Cart,Patch_Cart
+from db import create_db_and_tables, getCart_Print , addNewPrint,upsertCart,patchCartState
+from validations import Post_Print,Post_Cart,Patch_Cart
 
 app = FastAPI()
 
@@ -43,3 +43,8 @@ async def patch_cart(body: Patch_Cart, cart_id : int):
     result = patchCartState(cart_id, body)
     return result
 ##########################################
+
+@app.post("/newPrint")
+async def post_print(body: Post_Print):
+    result = addNewPrint(body)
+    return result
