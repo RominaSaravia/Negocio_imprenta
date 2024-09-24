@@ -10,7 +10,6 @@
         <div class="search_input">
             <label for="id_cart_val">Tiene un carrito??</label>
             <input type="number" name="id_cart_val" id="id_cart_val" min="1" max="1000" onchange="disableBtn(id_cart_val.value)">
-            <button id = "btn_search" disabled onclick="hadleSearch(id_cart_val.value)" >Search</button>
             <label for="btn_search" id="btn_search_lb" class="error_message"></label>
 
             <label for="client_email_val">email</label>
@@ -81,6 +80,11 @@
     </section>
 
 
+    <footer>
+        <a href="/">HOME</a>
+    </footer>
+
+
 </body>
 
 <script>
@@ -88,42 +92,9 @@
     hasCart = false;
 
     function disableBtn(value){
-        if(value && parseInt(value) > 0){  document.getElementById("btn_search").disabled = false;}
+        if(value && parseInt(value) > 0){  document.getElementById("btn_validate").disabled = false;}
     }
 
-
-    function hadleSearch(value){
-        console.log("handleSearch")
-        fetch("/seecart/"+value ,{
-            header: {
-                "Content-Type": "application/json",
-            },
-            method: "GET"             
-            })
-            .then(function(res){ return res.json(); })
-            .then(function(data){
-                if(data){
-                    if(!data[0].isError){
-                        console.log("No error")
-                        document.getElementById("btn_search_lb").textContent = 'OK'
-                        document.getElementById("cart_id").value = data[0].id;
-                        document.getElementById("cart").textContent =  "CART ID: "+ data[0].id +" -| email: "+ data[0].client_email;
-                        //document.getElementById("client_name").value = data[0].client_name;
-                        //document.getElementById("client_name").setAttribute("readonly","True"); 
-                        //document.getElementById("print_creation").style.display = "block";
-                        //document.getElementById("new_print").style.display = "none";
-
-                    }else{
-                        console.log("Error")
-                        document.getElementById("btn_search_lb").textContent = data[1]
-                        document.getElementById("print_creation").style.display = "none";
-                        document.getElementById("cart_creation").style.display = "none";
-                    }
-                }
-                
-            })
-
-    }
 
     function hadleEmailValidation(cart,email){
 
@@ -134,8 +105,7 @@
 
         function reqListener() {
             if (this.status == 200) {
-                console.log("200")
-                return
+                location.href = "/seecart/" + cart
             }
         }
 
