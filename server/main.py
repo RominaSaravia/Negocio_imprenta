@@ -70,7 +70,7 @@ async def val_printcreation( cart_id: Annotated[str, Form()],client_name: Annota
     if(client_email != '' and cart_id != ''):
         val = val_email(
             cart_id = int(cart_id, base=0), 
-            email = client_email
+            client_email = client_email
             )
         
         validation = validate_email(val)
@@ -95,19 +95,11 @@ async def val_printcreation( cart_id: Annotated[str, Form()],client_name: Annota
             client_email= client_email
         )
         addNewPrint(post_print,post_cart)
+        return await get_cart(post_print.cart_id, request)
 
 
     addNewPrint(post_print,None)
-
     return await get_cart(post_print.cart_id, request)
-
-    # cartset,printsList = await get_cart(post_print.cart_id)
-
-    # print(printsList)
-
-    # return templates.TemplateResponse(
-    #     request=request, name="cart.html", context={"printList":printsList, "cart": cartset}      
-    # )
 
 
 ##################__VALIDATION__###########################

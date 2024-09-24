@@ -9,16 +9,81 @@
     <h2>#{{cart.id}} carrito de {{cart.client_name}} -- Estado: {{cart.state}}</h2>
     {% for p in printList %}
     <div class="details">
-        <p>{{p.page_type}}</p>
-        <p>{{p.page_size}}</p>
-        <p>{{p.n_copies}}</p>
-        <p>{{p.color}}</p>
+        <p>Tipo de pape: {{p.page_type}}</p>
+        <p>Tamaño de hoja: {{p.page_size}}</p>
+        <p>Numero d ecopias{{p.n_copies}}</p>
+        <p>Impresion {{p.color}}</p>
         <p class="print_price">{{p.price}}</p>
         <p>--------------------------------------</p>
 
     </div>
     {% endfor %}
     <h2 id="total_price">Total a pagar: </h2>
+
+    <section id="new_print">
+        <button id = "btn_new" onclick="hadleNewPrint()" >Nuevo carrito</button>
+    </section>
+
+<!--------------------------------___PRINT__CREATION___--------------------------------------->
+    <section id="print_creation" style="display: none;" >
+
+        <form action="/printcreation" method="post" >
+
+            <section id="cart_creation">
+            <input type="text" name="cart_id" id="cart_id" value="{{cart.id}}" hidden required readonly>
+    
+            <label for="client_name">Nombre:</label>
+            <input type="text" name="client_name" id="client_name" value="{{cart.client_name}}" required readonly >
+
+            <label for="client_email">email</label>
+            <input type="text" name="client_email" id="client_email" value="{{cart.client_email}}" required readonly>
+        
+            </section>
+
+            <section id="Print_details">
+                <h2>Nueva Impresión</h2>
+                <label for="page_type">Selecciona la Hoja:</label>
+                <select name="page_type" id="page_type" required>
+                    <option value="Obra 80gr" selected>Obra 80gr</option>
+                    <option value="Ilustracion 120gr" >Ilustración 120gr</option>
+                </select>
+        
+                <label for="page_size">Tamaño de la Hoja:</label>
+                <select name="page_size" id="page_size" required>
+                    <option value="A4" selected>A4</option>
+                    <option value="A3" >A3</option>
+                </select>
+        
+                <label for="color">Color:</label>
+                <select name="color" id="color" required>
+                    <option value="color">Color</option>
+                    <option value="byn" selected>ByN</option>
+                </select>
+        
+                <label for="n_pages">Numero de hojas:</label>
+                <input type="number" name="n_pages" id="n_pages" min="1" max="1000">
+        
+                <label for="n_sides">Caras Impresas:</label>
+                <select name="n_sides" id="n_sides" required>
+                    <option value="1">Simple faz</option>
+                    <option value="2" selected>doble faz</option>
+                </select>      
+        
+                <label for="n_copies">Numero de copias:</label>
+                <input type="number" name="n_copies" id="n_copies" min="1" max="100">
+        
+                <input type="submit" value="Crear Pedido" >
+            </section>
+    
+        </form>
+
+    </section>
+
+    <br>
+
+    <footer>
+        <a href="/">HOME</a>
+    </footer>
  
 </body>
 
@@ -38,6 +103,11 @@
     }
 
     getResultPrice()
+
+    function hadleNewPrint(){
+        document.getElementById("btn_new").style.display = "none";
+        document.getElementById("print_creation").style.display = "block";
+    }
 
 
 
