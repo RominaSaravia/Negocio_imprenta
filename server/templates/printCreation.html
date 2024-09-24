@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imprenta</title>
+</head>
+<body>
+    <section id="cart_search">
+        <div class="search_input">
+            <label for="id_cart_val">Tiene un carrito??</label>
+            <input type="number" name="id_cart_val" id="id_cart_val" min="1" max="1000" onchange="disableBtn(id_cart_val.value)">
+            <button id = "btn_search" disabled onclick="hadleSearch(id_cart_val.value)" >Search</button>
+            <label for="btn_search" id="btn_search_lb" class="error_message"></label>
+
+            <label for="client_email_val">email</label>
+            <input type="text" name="client_email_val" id="client_email_val" >
+            <button id = "btn_validate" onclick="hadleEmailValidation(id_cart_val.value,client_email_val.value )" >Validar</button>
+        </div>
+    </section>
+
+    <section id="new_print">
+        <button id = "btn_new" onclick="hadleNewCart()" >Nuevo carrito</button>
+    </section>
+
+<!--------------------------------___PRINT__CREATION___--------------------------------------->
+    <section id="print_creation" style="display: none;" >
+
+        <form action="/printcreation" method="post" >
+
+            <section id="cart_creation">
+            <p id="cart"></p>
+            <input type="text" name="cart_id" id="cart_id" hidden>
+    
+    
+            <label for="client_name">Nombre:</label>
+            <input type="text" name="client_name" id="client_name"  required >
+
+            <label for="client_email">email</label>
+            <input type="text" name="client_email" id="client_email"  required>
+        
+            </section>
+
+            <section id="Print_details">
+                <h2>Nueva Impresión</h2>
+                <label for="page_type">Selecciona la Hoja:</label>
+                <select name="page_type" id="page_type" required>
+                    <option value="Obra 80gr" selected>Obra 80gr</option>
+                    <option value="Ilustracion 120gr" >Ilustración 120gr</option>
+                </select>
+        
+                <label for="page_size">Tamaño de la Hoja:</label>
+                <select name="page_size" id="page_size" required>
+                    <option value="A4" selected>A4</option>
+                    <option value="A3" >A3</option>
+                </select>
+        
+                <label for="color">Color:</label>
+                <select name="color" id="color" required>
+                    <option value="color">Color</option>
+                    <option value="byn" selected>ByN</option>
+                </select>
+        
+                <label for="n_pages">Numero de hojas:</label>
+                <input type="number" name="n_pages" id="n_pages" min="1" max="1000">
+        
+                <label for="n_sides">Caras Impresas:</label>
+                <select name="n_sides" id="n_sides" required>
+                    <option value="1">Simple faz</option>
+                    <option value="2" selected>doble faz</option>
+                </select>      
+        
+                <label for="n_copies">Numero de copias:</label>
+                <input type="number" name="n_copies" id="n_copies" min="1" max="100">
+        
+                <input type="submit" value="Crear Pedido" >
+            </section>
+    
+        </form>
+
+    </section>
+
+
+</body>
+
+<script>
+
+    hasCart = false;
+
+    function disableBtn(value){
+        if(value && parseInt(value) > 0){  document.getElementById("btn_search").disabled = false;}
+    }
+
+
+    function hadleSearch(value){
+        console.log("handleSearch")
+        fetch("/seecart/"+value ,{
+            header: {
+                "Content-Type": "application/json",
+            },
+            method: "GET"             
+            })
+            .then(function(res){ return res.json(); })
+            .then(function(data){
+                if(data){
+                    if(!data[0].isError){
+                        console.log("No error")
+                        document.getElementById("btn_search_lb").textContent = 'OK'
+                        document.getElementById("cart_id").value = data[0].id;
+                        document.getElementById("cart").textContent =  "CART ID: "+ data[0].id +" -| email: "+ data[0].client_email;
+                        //document.getElementById("client_name").value = data[0].client_name;
+                        //document.getElementById("client_name").setAttribute("readonly","True"); 
+                        //document.getElementById("print_creation").style.display = "block";
+                        //document.getElementById("new_print").style.display = "none";
+
+                    }else{
+                        console.log("Error")
+                        document.getElementById("btn_search_lb").textContent = data[1]
+                        document.getElementById("print_creation").style.display = "none";
+                        document.getElementById("cart_creation").style.display = "none";
+                    }
+                }
+                
+            })
+
+    }
+
+    function hadleEmailValidation(cart,email){
+
+        let body = JSON.stringify({
+                cart_id:cart,
+                client_email:email
+                }) 
+
+        function reqListener() {
+            if (this.status == 200) {
+                console.log("200")
+                return
+            }
+        }
+
+        const req = new XMLHttpRequest();
+        req.addEventListener("load", reqListener);
+        req.open("POST", "/authbyemail");
+        req.setRequestHeader("Content-Type","application/json");
+        req.send(body);
+
+    }
+    // ---------------------------__NEW_PRINT__----------------------------------
+    function hadleNewCart(){
+        document.getElementById("btn_new").style.display = "none";
+        document.getElementById("cart_search").style.display = "none";
+        document.getElementById("print_creation").style.display = "block";
+    }
+</script>
+
+<style>
+    #cart_search  {
+        padding: 2rem 1rem;
+    }
+    .search_input{
+        padding: 1rem;
+        margin: auto 1rem;
+        background-color: rgb(164, 200, 241);
+        width: fit-content;
+    }
+
+    .error_message {
+        color: red;
+    }
+    .ok_message {
+        color: rgb(14, 156, 1);
+    }
+
+
+    #new_print{
+        padding: 2rem;
+    }
+
+    #btn_new {
+        font-size: 1.5rem;
+    }
+
+    @media only screen and (min-width: 992px) {
+        body {margin: 1rem;}
+    }
+
+
+</style>
+</html>

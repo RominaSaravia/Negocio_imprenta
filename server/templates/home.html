@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imprenta</title>
+</head>
+<body>
+    <h2>Impresiones :)</h2>
+
+    <section class="HelpLinks">
+        <a href="/printcreation" alt="pedir impresiones">Seccion impresiones</a>
+        <br>
+
+        <label for="cart_id">Identificador del carrito: </label>
+        <input type="number" name="cart_id" id="cart_id" min="0" onchange="handleChange(cart_id)">
+
+        <label for="client_email_val">email</label>
+        <input type="text" name="client_email_val" id="client_email_val" >
+
+        <label for="btn_search"></label>
+        <button type="button" id="btn_search" disabled onclick="hadleEmailValidation(cart_id.value,client_email_val.value)">VER</button>
+        <label for="btn_search" class="error_message" id="msg_search" display="none"></label>
+
+
+    </section>
+
+
+
+</body>
+
+<script>
+    function handleChange(value){
+        if(value){ document.getElementById("btn_search").disabled = false;}
+    }
+
+    function hadleEmailValidation(cart,email){
+        console.log(cart)
+        console.log(email)
+
+    let body = JSON.stringify({
+        cart_id:cart,
+        client_email:email
+        }) 
+
+    function reqListener() {
+        if (this.status == 200) {
+            location.href = "/seecart/" + cart
+        }
+        else
+        {
+            document.getElementById("msg_search").textContent = this.response
+            document.getElementById("msg_search").style.display = "block"
+        }
+    }
+
+    const req = new XMLHttpRequest();
+    req.addEventListener("load", reqListener);
+    req.open("POST", "/authbyemail");
+    req.setRequestHeader("Content-Type","application/json");
+    req.send(body);
+
+}
+
+</script>
+
+<style>
+
+    .error_message {
+        color: red;
+    }
+
+    @media only screen and (min-width: 992px) {
+        body {margin: 1rem;}
+    }
+
+
+</style>
+</html>
