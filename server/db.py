@@ -1,5 +1,5 @@
 from sqlmodel import Field, Session, SQLModel, create_engine, select,delete,join
-from validations import Post_Print,Post_Cart,Patch_Cart
+from validations import Post_Print,Post_Cart,Patch_Cart,Post_Print_Cart,val_email
 from datetime import datetime
 
 class Cart(SQLModel, table=True):
@@ -43,10 +43,14 @@ def getCart_Print(cart_id:int):
         printsList = []
         for c, p in cart_print:
             print(f'c: {c} , p: {p}')
-            cartset = dict(c)
+            if(c != None):
+                cartset = dict(c)
             if(p != None):
                 printsList.append(p)
 
+        if(cartset == None or cartset == {}):
+            print('************NONE****************')
+            return {'Method':'getCart_Print','isError':True}, ['Error','No Cart Found']
         return cartset,printsList
     
 # Desde el negocio actulaiza el state del carrito
@@ -94,18 +98,37 @@ def getAllPrints():
         result = session.exec(select(Print)).all()        
         return result
 
-def addNewPrint(newPrint: Post_Print):
+def addNewPrint(newPrint: Post_Print, newCart: Post_Cart | None = None ):
     with Session(engine) as session:
-        cartItem = session.exec( select(Cart).where(Cart.id == newPrint.cart_id) ).first() # verifico que exista el carrito en la DB
-        if(cartItem != None): 
-            newPrintComplete = completePrintDetails(newPrint)
-            session.add(newPrintComplete)
-            session.commit()
-            session.refresh(newPrintComplete)
+
+        if(newPrint.cart_id != None):
+            cartItem = session.exec( select(Cart).where(Cart.id == newPrint.cart_id) ).first() # verifico que exista el carrito en la DB
+        else:
+            cartItem = upsertCart(newCart)
+            newPrint.cart_id = cartItem.id
+
+        if( cartItem != None):
+            newPrintComplete, error = completePrintDetails(newPrint)
+            if (error == '' or error == None):
+                session.add(newPrintComplete)
+                session.commit()
+                session.refresh(newPrintComplete)
+                return newPrintComplete
+            else:
+                return error
+
+
         else: # el carrito no se encuentra en la DB
             return 'Error: No hay carrito'
-        
-        return newPrintComplete
+
+
+
+def validate_email(data:val_email):
+    with Session(engine) as session:
+        cartItem = session.exec( select(Cart).where(Cart.id == data.cart_id).where(Cart.client_email == data.client_email) ).first() 
+        if (cartItem != None):
+            return True
+        return False      
 
 
 def completePrintDetails(newPrint: Post_Print):
@@ -126,9 +149,9 @@ def completePrintDetails(newPrint: Post_Print):
     
     # Determinar el precio de la impresion
     match newPrint.color:
-        case "Color":
+        case "color":
             color_price = 500
-        case "ByN":
+        case "byn":
             color_price = 250
         case _:
             color_price = 0
@@ -145,13 +168,11 @@ def completePrintDetails(newPrint: Post_Print):
     match newPrint.page_type:
         case "Obra 80gr":
             print_price = 250
-        case "Papel ilustración 120gr":
+        case "Ilustracion 120gr":
             print_price = 350
         case _:
             error += 'Falta detallar el tipo de hoja a imprimir. '
 
-    if (error):
-        return error
-    else:
-        PrintCompleto.price = (color_price + page_price + print_price) * newPrint.n_copies
-        return PrintCompleto
+    PrintCompleto.price = (color_price + page_price + print_price) * newPrint.n_copies
+    print(PrintCompleto)
+    return PrintCompleto, error

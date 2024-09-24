@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imprenta - carrito</title>
+</head>
+<body>
+    <h2>#{{cart.id}} carrito de {{cart.client_name}} -- Estado: {{cart.state}}</h2>
+    {% for p in printList %}
+    <div class="details">
+        <p>{{p.page_type}}</p>
+        <p>{{p.page_size}}</p>
+        <p>{{p.n_copies}}</p>
+        <p>{{p.color}}</p>
+        <p class="print_price">{{p.price}}</p>
+        <p>--------------------------------------</p>
+
+    </div>
+    {% endfor %}
+    <h2 id="total_price">Total a pagar: </h2>
+ 
+</body>
+
+<script>
+
+    let summaryOfPrices = 0;
+
+    function getResultPrice(){
+        items = document.getElementsByClassName("print_price")
+        for (i=0; i < items.length ;i++){
+            summaryOfPrices += parseFloat( items[i].innerText );
+
+        }
+        document.getElementById("total_price").textContent += summaryOfPrices;
+
+
+    }
+
+    getResultPrice()
+
+
+
+</script>
+</html>
