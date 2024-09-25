@@ -33,3 +33,12 @@ class Post_Print_Cart(BaseModel):
     color: str
     url_file: str
 
+class Post_user(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+    password:str
+
+
+class Delete_Print(BaseModel):
+    id: str

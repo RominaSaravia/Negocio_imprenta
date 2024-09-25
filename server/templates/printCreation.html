@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/server/static/css/styles.css">
     <title>Imprenta</title>
 </head>
 <body>
+    {% include 'header.html' %}
+
     <section id="cart_search">
         <div class="search_input">
             <label for="id_cart_val">Tiene un carrito??</label>
@@ -14,12 +17,12 @@
 
             <label for="client_email_val">email</label>
             <input type="text" name="client_email_val" id="client_email_val" >
-            <button id = "btn_validate" onclick="hadleEmailValidation(id_cart_val.value,client_email_val.value )" >Validar</button>
+            <button id = "btn_validate" class="button confirm"  onclick="hadleEmailValidation(id_cart_val.value,client_email_val.value )" >Validar</button>
         </div>
     </section>
 
     <section id="new_print">
-        <button id = "btn_new" onclick="hadleNewCart()" >Nuevo carrito</button>
+        <button id = "btn_new" class="button"  onclick="hadleNewCart()" >Nuevo carrito</button>
     </section>
 
 <!--------------------------------___PRINT__CREATION___--------------------------------------->
@@ -40,7 +43,7 @@
         
             </section>
 
-            <section id="Print_details">
+            <section class="Print_details">
                 <h2>Nueva Impresión</h2>
                 <label for="page_type">Selecciona la Hoja:</label>
                 <select name="page_type" id="page_type" required>
@@ -72,17 +75,14 @@
                 <label for="n_copies">Numero de copias:</label>
                 <input type="number" name="n_copies" id="n_copies" min="1" max="100">
         
-                <input type="submit" value="Crear Pedido" >
+                <input type="submit" value="Crear Pedido" class="button"  >
             </section>
     
         </form>
 
     </section>
 
-
-    <footer>
-        <a href="/">HOME</a>
-    </footer>
+    {% include 'footer.html' %}
 
 
 </body>
@@ -122,39 +122,12 @@
         document.getElementById("cart_search").style.display = "none";
         document.getElementById("print_creation").style.display = "block";
     }
+
+    function redirectTo(urlParam){
+       console.log("click")
+       location.href = "/" + urlParam
+    }
 </script>
 
-<style>
-    #cart_search  {
-        padding: 2rem 1rem;
-    }
-    .search_input{
-        padding: 1rem;
-        margin: auto 1rem;
-        background-color: rgb(164, 200, 241);
-        width: fit-content;
-    }
 
-    .error_message {
-        color: red;
-    }
-    .ok_message {
-        color: rgb(14, 156, 1);
-    }
-
-
-    #new_print{
-        padding: 2rem;
-    }
-
-    #btn_new {
-        font-size: 1.5rem;
-    }
-
-    @media only screen and (min-width: 992px) {
-        body {margin: 1rem;}
-    }
-
-
-</style>
 </html>

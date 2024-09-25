@@ -3,17 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/server/static/css/styles.css">
     <title>Imprenta - carrito</title>
 </head>
 <body>
+    <header>
+        <button type="button" class="button"  onclick="redirectTo('')">Home</button>
+
+    </header>
     <h2>#{{cart.id}} carrito de {{cart.client_name}} -- Estado: {{cart.state}}</h2>
     {% for p in printList %}
     <div class="details">
-        <p>Tipo de pape: {{p.page_type}}</p>
+        <p>#{{p.id}}</p>
+        <p>Tipo de papel: {{p.page_type}}</p>
         <p>Tamaño de hoja: {{p.page_size}}</p>
         <p>Numero d ecopias{{p.n_copies}}</p>
         <p>Impresion {{p.color}}</p>
         <p class="print_price">{{p.price}}</p>
+        <button class="button btn_delete"  onclick="handleDelete({{p.id}})" >Eliminar</button>
         <p>--------------------------------------</p>
 
     </div>
@@ -21,7 +28,7 @@
     <h2 id="total_price">Total a pagar: </h2>
 
     <section id="new_print">
-        <button id = "btn_new" onclick="hadleNewPrint()" >Nuevo carrito</button>
+        <button id = "btn_new" class="button" onclick="hadleNewPrint()" >Nuevo carrito</button>
     </section>
 
 <!--------------------------------___PRINT__CREATION___--------------------------------------->
@@ -82,7 +89,26 @@
     <br>
 
     <footer>
-        <a href="/">HOME</a>
+        {% if logged %}
+        <h2>User loggeado</h2>
+        <h3>Cambiar estado del pedido?</h3>
+
+        <label for="new_state">nuevo estado</label>
+        <select name="new_state" id="new_state" required>
+            <option value="In Progress">In Progress</option>
+            <option value="Listo para retirar" selected>Listo para retirar</option>
+        </select>
+        <div>
+            <button class="button confirm" onclick="handleChangeState(new_state.value, {{cart.id}})" >CAMBIAR ESTADO</button>
+        </div>
+
+        <div>
+            <button class="button btn_delete logout" onclick="logOut()" >log out</button>
+        </div>
+        {% else %}
+        <p>Tienes usuario?</p>
+        <button type="button" class="button"  onclick="redirectTo('login')">login</button>
+        {% endif %}
     </footer>
  
 </body>
@@ -98,15 +124,65 @@
 
         }
         document.getElementById("total_price").textContent += summaryOfPrices;
-
-
     }
 
     getResultPrice()
 
+    function handleDelete(print_id){
+        function reqListener() {
+            if (this.status == 200) {
+                location.reload()
+            }
+        }
+        const req = new XMLHttpRequest();
+        req.addEventListener("load", reqListener);
+        req.open("DELETE", "/deletePrint/" + print_id);
+        req.setRequestHeader("Content-Type","application/json");
+        req.send();
+
+    }
+
+    function handleChangeState(newValue, cart){
+        let body = JSON.stringify({
+                state:newValue
+                }) 
+
+        function reqListener() {
+            if (this.status == 200) {
+                location.reload()
+            }
+        }
+
+        const req = new XMLHttpRequest();
+        req.addEventListener("load", reqListener);
+        req.open("PATCH", "/newStateOnCart/" + cart);
+        req.setRequestHeader("Content-Type","application/json");
+        req.send(body);
+
+
+    }
+
     function hadleNewPrint(){
         document.getElementById("btn_new").style.display = "none";
         document.getElementById("print_creation").style.display = "block";
+    }
+
+    function logOut(){
+       
+       fetch("/delete_cookie" , {
+           method: "GET"
+
+       }).then(function(data){
+           if(data.redirected){
+               location.href = data.url
+           }
+
+       })
+   }
+
+    function redirectTo(urlParam){
+       console.log("click")
+       location.href = "/" + urlParam
     }
 
 
