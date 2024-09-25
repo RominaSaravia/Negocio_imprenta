@@ -1,0 +1,153 @@
+#cart_search  {
+    padding: 2rem 1rem;
+}
+.search_input{
+    padding: 1rem;
+    margin: auto 1rem;
+    background-color: rgb(164, 200, 241);
+    width: fit-content;
+}
+
+/* buttons */
+.button {
+    background-color: #04AA6D; /* Green */
+    border: none;
+    border-radius: 0.5rem;
+    color: white;
+    padding: 16px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+  }
+
+.button.home{
+    padding: 1rem 1rem 0.5rem 0;
+    background-color: transparent;
+    color: white;
+}
+
+.button.home:hover{
+    font-weight: bolder;
+}
+
+.btn_delete {
+    background-color: #f44336;
+    color: white;
+    border: 2px solid #e7e7e7;
+}
+.btn_delete:hover {
+    border: 2px solid #e7e7e7;
+    background-color: #5a0000 ;
+    color: white;
+}
+
+.btn_new{
+    border: 2px solid #e7e7e7;
+    margin: 1rem;
+
+}
+
+
+.btn_new:hover{
+    border: 2px solid #e7e7e7;
+    background-color: #005a35 ;
+    color: white;
+
+}
+
+.confirm {
+    background-color: #4b97fa;
+    color: white;
+    border: 2px solid #e7e7e7;
+
+}
+
+.confirm:hover {
+    border: 2px solid #e7e7e7;
+    background-color: #002a5a ;
+    color: white;
+
+}
+/* End buttons */ 
+
+/* Messages */
+.error_message {
+    color: red;
+}
+.ok_message {
+    color: rgb(14, 156, 1);
+}
+/* End Messages */
+
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #466eda;
+    color: white;
+    text-align: center;
+  }
+section{
+    padding: 1rem 2rem;
+
+}
+
+section.login{
+    margin: auto;
+    width: fit-content;
+    background-color: #466eda;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+
+}
+section.login h3{
+    text-align: center;
+}
+
+section.HelpLinks .header_div{
+    margin: auto;
+    background-color: #466eda;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+
+}
+
+section.Print_details{
+    display: flex;
+    flex-direction: column;
+}
+
+section.Print_details select{
+    margin: 0 0 1rem  0;
+
+}
+
+section.Print_details input{
+    margin: 0 0 1rem  0;
+
+}
+
+body{
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.header_div{
+    background-color: #466eda;
+    margin: -1rem;
+    padding: 2rem;
+}
+.header_div h2 {
+    color: white;
+    margin: 0.5rem;
+}
+
+@media only screen and (min-width: 992px) {
+    body {margin: 1rem;}
+}

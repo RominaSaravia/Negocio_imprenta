@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <footer>
+        {% if logged %}
+        <h2>User loggeado</h2>
+        <div>
+            <button class="button btn_delete logout" onclick="logOut()" >log out</button>
+        </div>
+        {% else %}
+        <p>Tienes usuario?</p>
+        <button type="button" class="button confirm"  onclick="redirectTo('login')">login</button>
+        {% endif %}
+    </footer>
+</body>
+</html>

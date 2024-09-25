@@ -1,5 +1,5 @@
 from sqlmodel import Field, Session, SQLModel, create_engine, select,delete,join
-from validations import Post_Print,Post_Cart,Patch_Cart,Post_Print_Cart,val_email
+from validations import Post_Print,Post_Cart,Patch_Cart,Post_Print_Cart,val_email,Post_user
 from datetime import datetime
 
 class Cart(SQLModel, table=True):
@@ -19,6 +19,13 @@ class Print(SQLModel, table=True):
     color: str
     price: float | None = Field(default=None, index=True)
     url_file: str
+
+class Users(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    first_name: str
+    last_name: str
+    email: str
+    password:str
 
     
 
@@ -176,3 +183,29 @@ def completePrintDetails(newPrint: Post_Print):
     PrintCompleto.price = (color_price + page_price + print_price) * newPrint.n_copies
     print(PrintCompleto)
     return PrintCompleto, error
+
+
+def deletePrint(id:int):
+    with Session(engine) as session:
+        print("delete DB")
+        result = session.exec(delete(Print).where(Print.id == id))
+        session.commit()
+        return result
+
+###############__LOGIN___###############################
+def authUser(attempEmail,attempPassword):
+    with Session(engine) as session:
+        user = session.exec( select(Users.id).where(Users.email == attempEmail).where(Users.password == attempPassword) ).first()
+    print(user)
+    if user != None:
+        return user
+    
+    return None
+
+def addNewUser(user: Post_user ):
+    with Session(engine) as session:
+        newUser = Users( first_name = user.first_name, last_name = user.last_name , email = user.email, password = user.password)
+        session.add(newUser)
+        session.commit()
+        session.refresh(newUser)
+        return newUser
