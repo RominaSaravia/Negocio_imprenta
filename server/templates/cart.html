@@ -59,7 +59,7 @@
         
             </section>
 
-            <section id="Print_details">
+            <section class="Print_details">
                 <h2>Nueva Impresión</h2>
                 <label for="page_type">Selecciona la Hoja:</label>
                 <select name="page_type" id="page_type" required>
@@ -93,7 +93,7 @@
 
                 <input type="file" name="print_file" id="print_file">
         
-                <input type="submit" value="Crear Pedido" >
+                <input type="submit" value="Crear Pedido" class="button"  >
             </section>
     
         </form>
@@ -179,7 +179,7 @@
 
     function hadleNewPrint(){
         document.getElementById("btn_new").style.display = "none";
-        document.getElementById("print_creation").style.display = "block";
+        document.getElementById("print_creation").style.display = "flex";
     }
 
 
