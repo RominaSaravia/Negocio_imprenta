@@ -39,7 +39,8 @@
     <hr>
     <br>
     <div>
-        <button class="button confirm" onclick="handleChangeState('Cancelado', {{cart.id}})" >CAMBIAR ESTADO</button>
+        <button id="btn_cancel" class="button confirm" onclick="handleChangeState('Cancelado', {{cart.id}})" >CANCELAR PEDIDO</button>
+        <label for="btn_cancel">Una vez cancelado no se puede revertir</label>
     </div>
     {% endif %}
 
