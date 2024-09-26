@@ -233,6 +233,10 @@ section.Print_details input{
 }
 
 
+#print_creation {
+    margin: 1rem 2rem 10rem 2rem;
+}
+
 
 /* - - - - RESPONSIVE - - - - */
 
