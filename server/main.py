@@ -227,6 +227,7 @@ async def delete_cookie()->RedirectResponse :
     redirect = app.url_path_for('get_login')
     redirectR = RedirectResponse(url='/login')
     redirectR.delete_cookie('cookieUserId')
+    redirectR.delete_cookie('cart_id')
     return redirectR
 
 
