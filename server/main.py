@@ -139,14 +139,16 @@ async def val_printcreation( cart_id: Annotated[str, Form()],client_name: Annota
         post_print.cart_id = int(cart_id)
         addNewPrint(post_print,None)
         redirectR = RedirectResponse(url='/seecart/'+cart_id,status_code=303)
+        redirectR.set_cookie('cart_id',cart_id)
         return redirectR
     else:
         post_cart = Post_Cart(
             client_name= client_name,
             client_email= client_email
         )
-        addNewPrint(post_print,post_cart)
+        result = addNewPrint(post_print,post_cart)
         redirectR = RedirectResponse(url='/seecart/'+str(post_print.cart_id),status_code=303 )
+        redirectR.set_cookie('cart_id',result.cart_id)
         return redirectR
         
 
