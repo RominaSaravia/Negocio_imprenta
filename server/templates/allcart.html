@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/server/static/css/styles.css">
+    <script src="/server/static/js/controller.js"></script>
+
+    <title>Report Carts</title>
+</head>
+<body>
+
+    {% include 'header.html' %}
+
+    {% for c in cartList %}
+
+    <ul class="cart_list">
+        <li class="cart {{c.state}}">
+            <p>--ID:{{c.id}} - Contacto: {{c.client_email}} nombre {{c.client_name}} - Estado: {{c.state}} </p>
+            <button type="button" class="button btn_cart"  onclick="redirectTo('seecart/{{c.id}}')">VER</button>
+            
+        </li>
+    </ul>
+
+    {% endfor %}
+
+    {% include 'footer.html' %}
+    
+</body>
+</html>

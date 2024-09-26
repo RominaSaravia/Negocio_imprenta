@@ -4,29 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/server/static/css/styles.css">
+    <script src="/server/static/js/controller.js"></script> 
     <title>Imprenta</title>
 </head>
 <body>
     {% include 'header.html' %}
 
-    <section id="cart_search">
-        <div class="search_input">
-            <label for="id_cart_val">Tiene un carrito??</label>
-            <input type="number" name="id_cart_val" id="id_cart_val" min="1" max="1000" onchange="disableBtn(id_cart_val.value)">
-            <label for="btn_search" id="btn_search_lb" class="error_message"></label>
-
-            <label for="client_email_val">email</label>
-            <input type="text" name="client_email_val" id="client_email_val" >
-            <button id = "btn_validate" class="button confirm"  onclick="hadleEmailValidation(id_cart_val.value,client_email_val.value )" >Validar</button>
-        </div>
-    </section>
-
-    <section id="new_print">
-        <button id = "btn_new" class="button"  onclick="hadleNewCart()" >Nuevo carrito</button>
-    </section>
 
 <!--------------------------------___PRINT__CREATION___--------------------------------------->
-    <section id="print_creation" style="display: none;" >
+    <section id="print_creation" >
 
         <form action="/printcreation" method="post" >
 
@@ -74,6 +60,8 @@
         
                 <label for="n_copies">Numero de copias:</label>
                 <input type="number" name="n_copies" id="n_copies" min="1" max="100">
+
+                <input type="file" name="print_file" id="print_file">
         
                 <input type="submit" value="Crear Pedido" class="button"  >
             </section>
@@ -88,13 +76,6 @@
 </body>
 
 <script>
-
-    hasCart = false;
-
-    function disableBtn(value){
-        if(value && parseInt(value) > 0){  document.getElementById("btn_validate").disabled = false;}
-    }
-
 
     function hadleEmailValidation(cart,email){
 
@@ -120,13 +101,8 @@
     function hadleNewCart(){
         document.getElementById("btn_new").style.display = "none";
         document.getElementById("cart_search").style.display = "none";
-        document.getElementById("print_creation").style.display = "block";
     }
 
-    function redirectTo(urlParam){
-       console.log("click")
-       location.href = "/" + urlParam
-    }
 </script>
 
 

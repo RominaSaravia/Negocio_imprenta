@@ -10,6 +10,9 @@
         <div class="header_div">
             <h2>Impresiones :)</h2>
             <button type="button" class="button home"  onclick="redirectTo('')">Home</button>
+            {% if logged %}
+            <button type="button" class="button home"  onclick="redirectTo('seeallcart')">Carritos</button>
+            {% endif %}
         </div>
     </header>
 </body>

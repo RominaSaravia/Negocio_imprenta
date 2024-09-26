@@ -3,86 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/server/static/css/styles.css">
+    <script src="/server/static/js/controller.js"></script>    
+    <link rel="stylesheet" href="./server/static/css/styles.css">
     <title>Imprenta</title>
 </head>
 <body>
     {% include 'header.html' %}
 
-    <section class="HelpLinks">
+    <div class="content home">
 
-        <button type="button"  class="button btn_new"  onclick="redirectTo('printcreation')">Nuevo pedido</button>
-        <div>
-            <label for="cart_id">Identificador del carrito: </label>
-            <input type="number" name="cart_id" id="cart_id" min="0" onchange="handleChange(cart_id)">
-            <label for="client_email_val">email</label>
-            <input type="text" name="client_email_val" id="client_email_val" >
-            <label for="btn_search"></label>
-            <button type="button" id="btn_search" disabled class="button"  onclick="hadleEmailValidation(cart_id.value,client_email_val.value)">VER</button>
-            <label for="btn_search" class="error_message" id="msg_search" display="none"></label>
+        <section class="sideBar">
 
-        </div>
+            <div class="cart_search">
+                <div class="search_input">
+                    <label for="id_cart_val">Tiene un carrito??</label>
+                    <br>
+                    <label for="id_cart_val">N°</label>
+                    <input type="number" name="id_cart_val" id="id_cart_val" min="1" max="1000" onchange="disableBtn(id_cart_val.value)">
+                    <label for="btn_search" id="btn_search_lb" class="error_message"></label>
+            
+                    <label for="client_email_val">email</label>
+                    <input type="text" name="client_email_val" id="client_email_val" >
+                    <button id = "btn_validate" class="button confirm"  onclick="hadleEmailValidation(id_cart_val.value,client_email_val.value )" >Validar</button>
+                </div>
+            </div>
+    
+        </section>
+        <section class="main">
+    
+            <button type="button"  class="button large btn_new"  onclick="redirectTo('printcreation')">Nuevo pedido</button>
+    
+        </section>
 
-    </section>
-
+    </div>
 
     {% include 'footer.html' %}
 
 
 </body>
 
-<script>
-    function handleChange(value){
-        if(value){ document.getElementById("btn_search").disabled = false;}
-    }
-
-    function hadleEmailValidation(cart,email){
-        console.log(cart)
-        console.log(email)
-
-    let body = JSON.stringify({
-        cart_id:cart,
-        client_email:email
-        }) 
-
-    function reqListener() {
-        if (this.status == 200) {
-            location.href = "/seecart/" + cart
-        }
-        else
-        {
-            document.getElementById("msg_search").textContent = this.response
-            document.getElementById("msg_search").style.display = "block"
-        }
-    }
-
-    const req = new XMLHttpRequest();
-    req.addEventListener("load", reqListener);
-    req.open("POST", "/authbyemail");
-    req.setRequestHeader("Content-Type","application/json");
-    req.send(body);
-
-}
-
-
-function logOut(){
-       
-        fetch("/delete_cookie" , {
-            method: "GET"
-
-        }).then(function(data){
-            if(data.redirected){
-                location.href = data.url
-            }
-
-        })
-    }
-
-function redirectTo(urlParam){
-        console.log("click")
-        location.href = "/" + urlParam
- }
-
-</script>
 
 </html>

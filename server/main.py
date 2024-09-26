@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import FastAPI,Request, Response, Cookie, Form
 from starlette.responses import RedirectResponse
 from fastapi.responses import HTMLResponse
-from db import create_db_and_tables, getCart_Print , addNewPrint,upsertCart,patchCartState, validate_email,authUser,addNewUser,deletePrint
+from db import create_db_and_tables, getCart_Print , addNewPrint,upsertCart,patchCartState, validate_email,authUser,addNewUser,deletePrint,getAllCarts
 from validations import Post_Print,Post_Cart,Patch_Cart,val_email,Post_user,Delete_Print
 
 from fastapi.staticfiles import StaticFiles
@@ -37,13 +37,19 @@ async def home_page(request: Request, res:Response):
 
 @app.get("/seecart/{cart_id}", response_class=HTMLResponse)
 async def get_cart(cart_id : int,request: Request):
-    userId = validateAuth(request._cookies)
+    autorized = validateAuth(request._cookies)
+    owner = validateCartAuth(request._cookies)
 
-    cartset,printsList = getCart_Print(cart_id) 
+    if(autorized or (int(owner) == cart_id)):
+        cartset,printsList = getCart_Print(cart_id) 
+        return templates.TemplateResponse(
+            request=request, name="cart.html", context={"printList":printsList, "cart": cartset, "logged":autorized}      
+        )
+    else:
+        return templates.TemplateResponse(
+            request=request, name="notFound.html", context={}      
+        )
 
-    return templates.TemplateResponse(
-        request=request, name="cart.html", context={"printList":printsList, "cart": cartset, "logged":userId}      
-    )
 
 
 @app.post("/newCart")
@@ -55,10 +61,32 @@ async def post_cart(body: Post_Cart):
 
 
 @app.patch("/newStateOnCart/{cart_id}")
-async def patch_cart(body: Patch_Cart, cart_id : int):
-    result = patchCartState(cart_id, body)
-    return result
+async def patch_cart(body: Patch_Cart, cart_id : int, request: Request, res:Response):
+    autorized = validateAuth(request._cookies)
+    if (autorized):
+        result = patchCartState(cart_id, body)
+        return result
+    else:
+        if (body.state != 'Cancelado'):
+            res.status_code = 403
+            return 'No autorizado'
+        else:
+            result = patchCartState(cart_id, body)
+            return result
 
+
+@app.get("/seeallcart", response_class=HTMLResponse)
+async def get_cart(request: Request):
+    userId = validateAuth(request._cookies)
+    if (userId):
+        cartList = getAllCarts()
+        return templates.TemplateResponse(
+            request=request, name="allcart.html", context={"cartList":cartList, "logged":userId}      
+        )
+    else:
+        return templates.TemplateResponse(
+            request=request, name="notFound.html", context={}      
+        )
 
 
 
@@ -71,7 +99,6 @@ async def post_print(body: Post_Print):
 
 @app.delete("/deletePrint/{id}")
 async def delete_print(id: int):
-    print("delete main")
     result = deletePrint(id)
     return result
 
@@ -79,15 +106,16 @@ async def delete_print(id: int):
 ##################__NAVIGATION__###########################
 @app.get("/printcreation", response_class=HTMLResponse)
 async def printcreation(request: Request, res:Response): 
+    userId = validateAuth(request._cookies)
     return templates.TemplateResponse(
-        request=request, name="printCreation.html", context={}      
+        request=request, name="printCreation.html", context={"logged":userId}      
     )
 
 
 
 ##################__CREATION__###########################
 @app.post("/printcreation", response_class=RedirectResponse)
-async def val_printcreation( cart_id: Annotated[str, Form()],client_name: Annotated[str, Form()],client_email: Annotated[str, Form()] ,page_type: Annotated[str, Form()], page_size: Annotated[str, Form()], color: Annotated[str, Form()] , n_pages: Annotated[int, Form()], n_sides: Annotated[int, Form()] , n_copies: Annotated[int, Form()], res:Response,request: Request) ->RedirectResponse :
+async def val_printcreation( cart_id: Annotated[str, Form()],client_name: Annotated[str, Form()],client_email: Annotated[str, Form()] ,page_type: Annotated[str, Form()], page_size: Annotated[str, Form()], color: Annotated[str, Form()] , n_pages: Annotated[int, Form()], n_sides: Annotated[int, Form()] , n_copies: Annotated[int, Form()],print_file: Annotated[str,Form()], res:Response,request: Request) ->RedirectResponse :
     if(client_email != '' and cart_id != ''):
         val = val_email(
             cart_id = int(cart_id, base=0), 
@@ -105,7 +133,7 @@ async def val_printcreation( cart_id: Annotated[str, Form()],client_name: Annota
                     n_prints= n_prints,
                     n_copies = n_copies,
                     color =color,
-                    url_file = ''
+                    url_file = print_file
                     )
     if(cart_id != '' and cart_id != None ):
         post_print.cart_id = int(cart_id)
@@ -128,6 +156,7 @@ async def val_printcreation( cart_id: Annotated[str, Form()],client_name: Annota
 async def auth_byemail(body:val_email, res:Response):
     if(body):
         if(validate_email(body)):
+            res.set_cookie('cart_id',body.cart_id)
             res.status_code = 200
             return True
 
@@ -171,6 +200,13 @@ def validateAuth(cookies):
         return cookies['cookieUserId']
     else:
         return False
+    
+def validateCartAuth(cookies):
+    if  'cart_id' in cookies.keys():
+        return cookies['cart_id']
+    else:
+        return False
+
 
 @app.get("/auth/{userId}")
 async def authenticate( res:Response, userId:int=1):
@@ -190,3 +226,5 @@ async def delete_cookie()->RedirectResponse :
     redirectR = RedirectResponse(url='/login')
     redirectR.delete_cookie('cookieUserId')
     return redirectR
+
+

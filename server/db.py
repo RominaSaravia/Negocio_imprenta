@@ -42,25 +42,44 @@ def create_db_and_tables():
 
 
 #----------------------------CART_TABLE-------------------------------------
+def getAllCarts():
+    with Session(engine) as session:
+        result = []
+        result = session.exec(select(Cart)).all()        
+        return result
+    
 def getCart_Print(cart_id:int):
     with Session(engine) as session:
         cart_print = session.exec(  select(Cart,Print).join(Print,isouter=True).where(Cart.id == cart_id) )
-        print('************CART****************')
         cartset = {}
         printsList = []
         for c, p in cart_print:
-            print(f'c: {c} , p: {p}')
             if(c != None):
                 cartset = dict(c)
             if(p != None):
                 printsList.append(p)
 
         if(cartset == None or cartset == {}):
-            print('************NONE****************')
             return {'Method':'getCart_Print','isError':True}, ['Error','No Cart Found']
         return cartset,printsList
     
-# Desde el negocio actulaiza el state del carrito
+
+def getCart_Print(cart_id:int):
+    with Session(engine) as session:
+        cart_print = session.exec(  select(Cart,Print).join(Print,isouter=True).where(Cart.id == cart_id) )
+        cartset = {}
+        printsList = []
+        for c, p in cart_print:
+            if(c != None):
+                cartset = dict(c)
+            if(p != None):
+                printsList.append(p)
+
+        if(cartset == None or cartset == {}):
+            return {'Method':'getCart_Print','isError':True}, ['Error','No Cart Found']
+        return cartset,printsList
+    
+# Desde el negocio actualiza el state del carrito
 def patchCartState(cart_id, cartBody:Patch_Cart):
     with Session(engine) as session:
         cartItem = session.exec( select(Cart).where(Cart.id == cart_id) ).first() #Verifico en la DB la existencia del record
@@ -98,6 +117,12 @@ def upsertCart(cartBody:Post_Cart):
         return result
 
 #----------------------------PRINTS_TABLE-------------------------------------
+
+def getAllPrints():
+    with Session(engine) as session:
+        result = []
+        result = session.exec(select(Print)).all()        
+        return result
 
 def getAllPrints():
     with Session(engine) as session:
@@ -196,7 +221,6 @@ def deletePrint(id:int):
 def authUser(attempEmail,attempPassword):
     with Session(engine) as session:
         user = session.exec( select(Users.id).where(Users.email == attempEmail).where(Users.password == attempPassword) ).first()
-    print(user)
     if user != None:
         return user
     
